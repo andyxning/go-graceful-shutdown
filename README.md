@@ -48,9 +48,8 @@ const (
 )
 
 func sleep(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "hello \n")
 	time.Sleep(time.Second * time.Duration(5))
-	fmt.Fprint(w, "world\n")
+	fmt.Fprint(w, "hello world\n")
 }
 
 func check_health(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +83,7 @@ the output, then it looks that everything is good for now. Congratulations. :)
     * fourth one is used to run `curl http://localhost:8081/sleep`.
 
     **Gracefully Shutdown:**  
-    When you see the fourth terminal return a string **hello**, then you can directly run the command ` kill PID` in the third terminal.
+    After you run the `curl http://localhost:8081/sleep` command in the fourth terminal, then you can directly run the command ` kill PID` in the third terminal.
 
     You can now get the output from the first terminal like this(**Note: the time of second line is about 4 seconds later than the first lien's**):
     > 2015/12/22 14:02:53 Receive shutdown signal terminated
@@ -92,8 +91,7 @@ the output, then it looks that everything is good for now. Congratulations. :)
     > 2015/12/22 14:02:57 Exited. :)
 
     and, get the output from the fourth terminal like this:
-    > hello  
-    > world
+    > hello world
 
     This means that we shutdown the server gracefully.
 
