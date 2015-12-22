@@ -1,9 +1,6 @@
 package grace
 
-import (
-	"fmt"
-	"net/http"
-)
+import "net/http"
 
 type graceHandlerFunc func(http.ResponseWriter, *http.Request)
 
@@ -20,10 +17,10 @@ type graceHandlerFunc func(http.ResponseWriter, *http.Request)
 // `graceHandlerFunc.ServeHTTP`
 func (f graceHandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defaultGraceHTTPBarrier.Increase()
-	fmt.Print("enter\n")
-	fmt.Print(defaultGraceHTTPBarrier.GetCounter())
+	// fmt.Print("enter\n")
+	// fmt.Print(defaultGraceHTTPBarrier.GetCounter())
 	defer func() {
-		fmt.Print("exit\n")
+		// fmt.Print("exit\n")
 		defaultGraceHTTPBarrier.Decrease()
 	}()
 	// invoke the actual handler function
