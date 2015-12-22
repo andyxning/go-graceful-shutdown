@@ -74,7 +74,7 @@ func main() {
 ```
 * Now, open your browser and input `127.0.0.1:8081/healthcheck` to check if the server is running. If you see a string `OK` in
 the output, then it looks that everything is good for now. Congratulations. :)
-* Now, use `ps -ef|grep demo` to check for the running server's **pid**
+* Now, use `ps -ef|grep demo` to check for the running server's **pid**.
 * then you should open two more terminals
     * first one is used to start the server. Already done in step One. :)
     * second one is to run `ps -ef|grep demo`. Already done in step Two. :)
@@ -103,7 +103,7 @@ the output, then it looks that everything is good for now. Congratulations. :)
     > 2015/12/22 14:32:25 Exited. :)
 
     **Normal Shutdown:**  
-    If you want to check for the normal shutdown logic then you can wait for the `curl http://localhost:8081/sleep` to complete and then run the `kill PID`. you will find how normal shutdown happends. The normal output of the server is like this:
+    If you want to check for the normal shutdown logic then you can wait for the `curl http://localhost:8081/sleep` to complete and then run the `kill PID`. you will find how normal shutdown happens. The normal output of the server is like this:
     > 2015/12/22 14:30:14 Receive shutdown signal terminated  
     > 2015/12/22 14:30:14 Shutdown gracefully. :)  
     > 2015/12/22 14:30:14 Exited. :)
