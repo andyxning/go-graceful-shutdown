@@ -7,6 +7,8 @@ Graceful shutdown for Go in HTTP based service.
 # Feature
 * Graceful shutdown for Go with a HTTP service
 * support shutdown timeout and it is configurable when initialize an instance of  `grace.GraceServer`
+* **go-http-grace do not handle errors not caused by `Listener.Close()`. So, if
+your `Serve` method returns errors for some other reasons, Nothing is guaranteed!** :)
 
 # Usage
 * Use `grace.HandleFunc` to register a route, instead of `http.HandleFunc`
