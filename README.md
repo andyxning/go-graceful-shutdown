@@ -1,4 +1,5 @@
 # go-http-grace
+[![Build Status](https://travis-ci.org/andyxning/go-http-grace.svg)](https://travis-ci.org/andyxning/go-http-grace)
 Graceful shutdown for Go in HTTP based service.
 
 # Installation
