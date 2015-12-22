@@ -72,10 +72,10 @@ func main() {
 	srv.ListenAndServe()
 }
 ```
-* Now, open your browser and input `127.0.0.1:8081/healthcheck` to check if the server is running. If you see a string `OK` in
+* open your browser and input `127.0.0.1:8081/healthcheck` to check if the server is running. If you see a string `OK` in
 the output, then it looks that everything is good for now. Congratulations. :)
-* Now, use `ps -ef|grep demo` to check for the running server's **pid**.
-* then you should open two more terminals
+* use `ps -ef|grep demo` to check for the running server's **pid**.
+* you should open two more terminals
     * first one is used to start the server. Already done in step One. :)
     * second one is to run `ps -ef|grep demo`. Already done in step Two. :)
     * third one is used to run `kill PID`. **PID** is the pid of the running server. Get it from the second terminal. :)
