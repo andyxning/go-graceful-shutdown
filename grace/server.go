@@ -31,7 +31,7 @@ type GraceServer struct {
 // Note: This method is copied from `net/http/server.go`. I know this is ugly.
 //       However, i do not know other ways to achieve the same goal.
 //       If you have a good way to do the same job. RP is welcome. :)
-func (srv *GraceServer) ListenAndServe() error {
+func (srv *GraceServer) ListenAndServe() (err error) {
 	addr := srv.Addr
 	if addr == "" {
 		addr = ":http"
@@ -85,20 +85,23 @@ func (srv *GraceServer) ListenAndServe() error {
 	}()
 
 	// run http server
-	e := srv.Server.Serve(srv.graceListener)
+	err = srv.Server.Serve(srv.graceListener)
 	// we only process the error for the reason of close the listening socket.
 	// e.g., just like we invoke the `Close` method on listener.
 	// all other errors causing `Serve` to return will be returned to the caller
 	// directly. And, in such a situation the grace shutdown is not guaranteed!
-	if v, ok := e.(*net.OpError); ok {
+	if v, ok := err.(*net.OpError); ok {
 		if v.Err.Error() != "use of closed network connection" {
-			return e
+			return err
+		} else {
+			err = nil
 		}
 	}
 
 	<-srv.ExitChan
 	log.Println("Exited. :)")
-	return e
+
+	return
 }
 
 // tcpKeepAliveListener sets TCP keep-alive timeouts on accepted
