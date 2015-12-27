@@ -159,7 +159,8 @@ func main() {
 	srv.ListenAndServe()
 }
 ```
-* Conclusion: **The performance of `go-http-grace` is almost the same as `net/http`**
+
+* Conclusion: **The performance of `go-http-grace` is almost the same as `net/http`**  
 ## go-http-grace
 
 ```
