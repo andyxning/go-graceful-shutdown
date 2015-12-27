@@ -11,27 +11,27 @@ import (
 )
 
 const (
-	// ShutdownTimeout wait timeout in seconds
-	ShutdownTimeout int = 3
+	// shutdown wait timeout in seconds
+	shutdownTimeout int = 3
 )
 
-// GraceServer is used to replace `http.Server`
-type GraceServer struct {
+// Server is used to replace `http.Server`
+type Server struct {
 	http.Server
 	// We need the internal listener to shutdown http service gracefully.
-	graceListener net.Listener
-	Timeout       int
-	ShutdownChan  chan os.Signal
-	ExitChan      chan bool
+	listener     net.Listener
+	Timeout      int
+	ShutdownChan chan os.Signal
+	ExitChan     chan bool
 }
 
-// ListenAndServe listens on the TCP network address srv.Addr and handles HTTP
+// ListenAndServe listens on the TCP network address Addr and handles HTTP
 // requests.
 //
-// Note: This method is copied from `net/http/server.go`. I know this is ugly.
-//       However, i do not know other ways to achieve the same goal.
-//       If you have a good way to do the same job. RP is welcome. :)
-func (srv *GraceServer) ListenAndServe() (err error) {
+// Note: Some code used by his method is copied from "net/http/server.go".
+//       I know this is ugly. However, i do not know other ways to achieve the
+//       same goal. If you have a good way to do the same job. RP is welcome. :)
+func (srv *Server) ListenAndServe() (err error) {
 	addr := srv.Addr
 	if addr == "" {
 		addr = ":http"
@@ -41,16 +41,15 @@ func (srv *GraceServer) ListenAndServe() (err error) {
 		return err
 	}
 
-	// determine which timeout values to use: the instance one or the global one
 	var timeout int
 	if srv.Timeout == 0 {
-		timeout = ShutdownTimeout
+		timeout = shutdownTimeout
 	} else {
 		// A user defined timeout has been specified and it is not zero.
 		timeout = srv.Timeout
 	}
 
-	srv.graceListener = tcpKeepAliveListener{ln.(*net.TCPListener)}
+	srv.listener = tcpKeepAliveListener{ln.(*net.TCPListener)}
 
 	// register graceful shutdown signal `SIGTERM`
 	signal.Notify(srv.ShutdownChan, syscall.SIGTERM)
@@ -60,12 +59,12 @@ func (srv *GraceServer) ListenAndServe() (err error) {
 		select {
 		case sig := <-srv.ShutdownChan:
 			log.Println("Receive shutdown signal", sig)
-			// this will cause `srv.Server.Serve` to return with an error.
-			srv.graceListener.Close()
+			// this will cause "http.Server.Serve" to return with an error.
+			srv.listener.Close()
 			go func() {
 				for {
-					if defaultGraceHTTPBarrier.GetCounter() == 0 {
-						defaultGraceHTTPBarrier.Barrier <- true
+					if defaultHTTPBarrier.GetCounter() == 0 {
+						defaultHTTPBarrier.Barrier <- true
 						break
 					} else {
 						time.Sleep(time.Millisecond * time.Duration(10))
@@ -75,8 +74,8 @@ func (srv *GraceServer) ListenAndServe() (err error) {
 			select {
 			case <-time.After(time.Second * time.Duration(timeout)):
 				log.Printf("Shutdown timeout in %ds\n", timeout)
-				log.Printf("Shutdown!!!. There are still %d HTTP connections\n", defaultGraceHTTPBarrier.GetCounter())
-			case <-defaultGraceHTTPBarrier.Barrier:
+				log.Printf("Shutdown!!!. There are still %d HTTP connections\n", defaultHTTPBarrier.GetCounter())
+			case <-defaultHTTPBarrier.Barrier:
 				log.Print("Shutdown gracefully. :)")
 			}
 			// we can exit now. :)
@@ -85,10 +84,10 @@ func (srv *GraceServer) ListenAndServe() (err error) {
 	}()
 
 	// run http server
-	err = srv.Server.Serve(srv.graceListener)
-	// we only process the error for the reason of close the listening socket.
+	err = srv.Server.Serve(srv.listener)
+	// we only process error for the reason of close the listening socket.
 	// e.g., just like we invoke the `Close` method on listener.
-	// all other errors causing `Serve` to return will be returned to the caller
+	// All other errors causing `Serve` to return will be returned to the caller
 	// directly. And, in such a situation the grace shutdown is not guaranteed!
 	if v, ok := err.(*net.OpError); ok {
 		if v.Err.Error() != "use of closed network connection" {

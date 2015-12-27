@@ -2,16 +2,17 @@ package grace
 
 import "net/http"
 
-type graceServeMux struct {
+type ServeMux struct {
 	http.ServeMux
 }
 
-func (gsm *graceServeMux) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
-	gsm.Handle(pattern, graceHandlerFunc(handler))
+// HandleFunc registers a normal http handler function with one url path
+func (sm *ServeMux) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
+	sm.Handle(pattern, HandlerFunc(handler))
 }
 
-// NewGraceServeMux allocates and returns a new GraceServeMux.
-func newGraceServeMux() *graceServeMux { return &graceServeMux{*http.NewServeMux()} }
+// NewServeMux allocates and returns a new ServeMux instance.
+func NewServeMux() *ServeMux { return &ServeMux{*http.NewServeMux()} }
 
-// DefaultGraceServeMux should be register in `grace.GraceServer` with `Handler`
-var DefaultGraceServeMux = newGraceServeMux()
+// DefaultServeMux should be registered in "grace.Server" with "Handler"
+var DefaultServeMux = NewServeMux()

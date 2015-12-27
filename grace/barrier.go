@@ -2,24 +2,25 @@ package grace
 
 import "sync/atomic"
 
-type graceHTTPBarrier struct {
+type httpBarrier struct {
 	counter int32
 	Barrier chan bool
 }
 
-// We need to change the value of `counter` field, so the receiver of
-// `Increase` and `Decrease` method will be a pointer.
-func (ghb *graceHTTPBarrier) Increase() {
-	atomic.AddInt32(&ghb.counter, 1)
+// Increase increases the internal counter with one
+func (hb *httpBarrier) Increase() {
+	atomic.AddInt32(&hb.counter, 1)
 }
 
-func (ghb *graceHTTPBarrier) Decrease() {
-	atomic.AddInt32(&ghb.counter, -1)
+// Decrease decreases the internal counter with one
+func (hb *httpBarrier) Decrease() {
+	atomic.AddInt32(&hb.counter, -1)
 }
 
-func (ghb graceHTTPBarrier) GetCounter() (cur int32) {
-	cur = atomic.LoadInt32(&ghb.counter)
+// GetCounter returns the current internal counter
+func (hb httpBarrier) GetCounter() (cur int32) {
+	cur = atomic.LoadInt32(&hb.counter)
 	return
 }
 
-var defaultGraceHTTPBarrier = graceHTTPBarrier{counter: 0, Barrier: make(chan bool, 1)}
+var defaultHTTPBarrier = httpBarrier{counter: 0, Barrier: make(chan bool, 1)}
