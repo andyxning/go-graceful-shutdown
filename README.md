@@ -1,4 +1,6 @@
 # go-http-grace
+
+[![Join the chat at https://gitter.im/andyxning/go-http-grace](https://badges.gitter.im/andyxning/go-http-grace.svg)](https://gitter.im/andyxning/go-http-grace?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/andyxning/go-http-grace.svg)](https://travis-ci.org/andyxning/go-http-grace)  
 Graceful shutdown for Go in HTTP based service.
 
