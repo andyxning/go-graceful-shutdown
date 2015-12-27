@@ -1,0 +1,8 @@
+### 0.1.0
+first edition
+
+### 1.0.0
+* refactor. Note that **names** of some struct and type exported in `grace` package
+are refactored to be in a more Golang way. These changes include the following:
+    * `grace.GraceServer` -> `grace.Server`
+    * `grace.DefaultGraceServeMux` ->  `grace.DefaultServeMux`
