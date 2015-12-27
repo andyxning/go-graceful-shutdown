@@ -115,7 +115,130 @@ the output, then it looks that everything is good for now. Congratulations. :)
     > 2015/12/22 14:30:14 Exited. :)
 
 # Performance Test
+* Tools: `ab`.
+* Test command: `ab -n 10000 -c 128 http://127.0.0.1:8081/healthcheck`
+* Environment:
+    * Darwin Kernel Version 14.5.0
+    * 8 GB 1867 MHz DDR3
+    * 2.7 GHz Intel Core i5
+    * OS X Yosemite 10.10.5
+* Test request: "/healthcheck"
+* `net/http` server source code
 
+```go
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"time"
+)
+
+const (
+	Address string = "127.0.0.1:8081"
+)
+
+func sleep(w http.ResponseWriter, r *http.Request) {
+	time.Sleep(time.Second * time.Duration(10))
+	w.Write([]byte("hello world\n"))
+}
+
+func check_health(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "OK\n")
+}
+
+func main() {
+	srv := &http.Server{
+		Addr:           Address,
+		MaxHeaderBytes: 1 << 30,
+	}
+
+	http.HandleFunc("/", sleep)
+	http.HandleFunc("/healthcheck", check_health)
+
+	srv.ListenAndServe()
+}
+```
+* Conclusion: **The performance of `go-http-grace` is almost the same as `net/http`**
+## go-http-grace
+
+```
+Server Software:
+Server Hostname:        127.0.0.1
+Server Port:            8081
+
+Document Path:          /healthcheck
+Document Length:        3 bytes
+
+Concurrency Level:      128
+Time taken for tests:   1.707 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      1190000 bytes
+HTML transferred:       30000 bytes
+Requests per second:    5858.88 [#/sec] (mean)
+Time per request:       21.847 [ms] (mean)
+Time per request:       0.171 [ms] (mean, across all concurrent requests)
+Transfer rate:          680.87 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        2   12  51.1      7     562
+Processing:     4   10  35.8      7     562
+Waiting:        3   10  35.8      7     562
+Total:          7   22  62.6     14     573
+
+Percentage of the requests served within a certain time (ms)
+  50%     14
+  66%     15
+  75%     16
+  80%     16
+  90%     17
+  95%     18
+  98%     19
+  99%    570
+ 100%    573 (longest request)
+```
+
+## net/http
+
+```
+Server Software:
+Server Hostname:        127.0.0.1
+Server Port:            8081
+
+Document Path:          /healthcheck
+Document Length:        3 bytes
+
+Concurrency Level:      128
+Time taken for tests:   1.725 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      1190000 bytes
+HTML transferred:       30000 bytes
+Requests per second:    5796.20 [#/sec] (mean)
+Time per request:       22.083 [ms] (mean)
+Time per request:       0.173 [ms] (mean, across all concurrent requests)
+Transfer rate:          673.58 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        2    9  37.1      7     589
+Processing:     2   12  53.9      7     589
+Waiting:        1   12  54.0      7     589
+Total:          5   22  65.5     14     599
+
+Percentage of the requests served within a certain time (ms)
+  50%     14
+  66%     15
+  75%     15
+  80%     16
+  90%     17
+  95%     18
+  98%     21
+  99%    595
+ 100%    599 (longest request)
+```
 
 # Workflow
 
