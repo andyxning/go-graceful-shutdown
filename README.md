@@ -81,15 +81,15 @@ func main() {
 ```
 * open your browser and input `127.0.0.1:8081/healthcheck` to check if the server is running. If you see a string `OK` in
 the output, then it looks that everything is good for now. Congratulations. :)
-* use `ps -ef|grep demo` to check for the running server's **pid**.
+* use `ps -ef|grep demo` or `pidof demo` to check for the running server's **pid**.
 * you should open two more terminals
     * first one is used to start the server. Already done in step One. :)
     * second one is to run `ps -ef|grep demo`. Already done in step Two. :)
-    * third one is used to run `kill PID`. **PID** is the pid of the running server. Get it from the second terminal. :)
+    * third one is used to run `kill $(pidof demo)`. `pidof demo` returns the pid of the running server. 
     * fourth one is used to run `curl http://127.0.0.1:8081/sleep`.
 
     **Gracefully Shutdown:**  
-    After you run the `curl http://127.0.0.1:8081/sleep` command in the fourth terminal, then you can directly run the command ` kill PID` in the third terminal.
+    After you run the `curl http://127.0.0.1:8081/sleep` command in the fourth terminal, then you can directly run the command `kill $(pidof demo)` in the third terminal.
 
     You can now get the output from the first terminal like this(**Note: the time of second line is about 4 seconds later than the first lien's**):
     > 2015/12/22 14:02:53 Receive shutdown signal terminated
@@ -109,7 +109,7 @@ the output, then it looks that everything is good for now. Congratulations. :)
     > 2015/12/22 14:32:25 Exited. :)
 
     **Normal Shutdown:**  
-    If you want to check for the normal shutdown logic then you can wait for the `curl http://127.0.0.1:8081/sleep` to complete and then run the `kill PID`. you will find how normal shutdown happens. The normal output of the server is like this:
+    If you want to check for the normal shutdown logic then you can wait for the `curl http://127.0.0.1:8081/sleep` to complete and then run the `kill $(pidof demo)`. you will find how normal shutdown happens. The normal output of the server is like this:
     > 2015/12/22 14:30:14 Receive shutdown signal terminated  
     > 2015/12/22 14:30:14 Shutdown gracefully. :)  
     > 2015/12/22 14:30:14 Exited. :)
