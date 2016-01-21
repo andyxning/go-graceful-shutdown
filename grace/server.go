@@ -13,6 +13,8 @@ import (
 const (
 	// shutdown wait timeout in seconds
 	shutdownTimeout int = 3
+	// listening socket closed error string
+	errClosing string = "use of closed network connection"
 )
 
 // Server is used to replace `http.Server`
@@ -59,7 +61,7 @@ func (srv *Server) ListenAndServe() (err error) {
 		select {
 		case sig := <-srv.ShutdownChan:
 			log.Println("Receive shutdown signal", sig)
-			// this will cause "http.Server.Serve" to return with an error.
+		// this will cause "http.Server.Serve" to return with an error.
 			srv.listener.Close()
 			go func() {
 				for {
@@ -71,14 +73,14 @@ func (srv *Server) ListenAndServe() (err error) {
 					}
 				}
 			}()
-			select {
-			case <-time.After(time.Second * time.Duration(timeout)):
-				log.Printf("Shutdown timeout in %ds\n", timeout)
-				log.Printf("Shutdown!!!. There are still %d HTTP connections\n", defaultHTTPBarrier.GetCounter())
-			case <-defaultHTTPBarrier.Barrier:
-				log.Print("Shutdown gracefully. :)")
-			}
-			// we can exit now. :)
+				select {
+				case <-time.After(time.Second * time.Duration(timeout)):
+					log.Printf("Shutdown timeout in %ds\n", timeout)
+					log.Printf("Shutdown!!!. There are still %d HTTP connections\n", defaultHTTPBarrier.GetCounter())
+				case <-defaultHTTPBarrier.Barrier:
+					log.Print("Shutdown gracefully. :)")
+				}
+		// we can exit now. :)
 			srv.ExitChan <- true
 		}
 	}()
@@ -90,7 +92,7 @@ func (srv *Server) ListenAndServe() (err error) {
 	// All other errors causing `Serve` to return will be returned to the caller
 	// directly. And, in such a situation the grace shutdown is not guaranteed!
 	if v, ok := err.(*net.OpError); ok {
-		if v.Err.Error() != "use of closed network connection" {
+		if v.Err.Error() != errClosing {
 			return err
 		} else {
 			err = nil
